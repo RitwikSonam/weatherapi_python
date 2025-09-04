@@ -1,0 +1,85 @@
+{% extends 'dummy.html' %}
+
+{% block title %}
+    <title>Registration Page</title>
+{% endblock %}
+
+{% block body_block %}
+<div class="container-custom">
+    <h1>Fill the Form and Register</h1>
+    <p class="lead">Join us and experience the future of web design.</p>
+    <form method="POST" enctype="multipart/form-data" class="form-custom">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ uf.as_p }}
+        </div>
+        <div class="form-group">
+            {{ pf.as_p }}
+        </div>
+        <input type="submit" value="Register" class="btn btn-custom">
+    </form>
+</div>
+
+<style>
+    .form-custom {
+        background: rgba(255, 255, 255, 0.2);  /* Light translucent white */
+        padding: 20px;
+        border-radius: 15px;
+        border: 1px solid #00ffcc;  /* Bright aqua border */
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-custom p {
+        color: #e0f7f7; /* Very light aqua text */
+    }
+
+    .form-custom label {
+        color: #00ffcc;  /* Neon aqua */
+        font-weight: bold;
+    }
+
+    .form-custom input,
+    .form-custom select,
+    .form-custom textarea {
+        background: #004466;  /* Dark teal-blue */
+        border: 1px solid #00ffcc;  /* Bright aqua border */
+        color: #e0f7f7;  /* Light aqua text */
+        border-radius: 10px;
+        padding: 10px;
+        width: 100%;
+        transition: all 0.3s ease;
+    }
+
+    .form-custom input::placeholder {
+        color: #99d9d9; /* lighter placeholder */
+    }
+
+    .form-custom input:focus,
+    .form-custom select:focus,
+    .form-custom textarea:focus {
+        background: #00ffcc;  /* Bright aqua */
+        border-color: #00ffcc;
+        color: #004466;  /* Dark text */
+        outline: none;
+    }
+
+    .form-custom input[type="submit"] {
+        background: #00ffcc;
+        color: #004466;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .form-custom input[type="submit"]:hover {
+        background: #004466;
+        color: #00ffcc;
+        transform: translateY(-3px);
+    }
+</style>
+
+{% endblock %}

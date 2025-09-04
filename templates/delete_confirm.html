@@ -1,0 +1,13 @@
+{% extends 'dummy.html' %}
+{% block title %}<title>Confirm Delete</title>{% endblock %}
+{% block body_block %}
+<div class="container-custom">
+    <h1>Are you sure?</h1>
+    <p class="lead">Deleting your profile is permanent and cannot be undone.</p>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'profile_display' %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}

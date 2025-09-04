@@ -1,0 +1,23 @@
+{% extends 'dummy.html' %}
+{% load static %}
+
+{% block body_block %}
+<!-- Weather Background Container -->
+<div class="weather-background sunny" data-authenticated="{{ user.is_authenticated|yesno:'true,false' }}" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; overflow: hidden;">
+    <video id="weather-video" autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+    <div id="particles-js" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+</div>
+
+<!-- Page Content -->
+<div class="container" style="position: relative; z-index: 10;">
+    {% if username %}
+        <h1>Welcome back, {{ username }}</h1>
+    {% else %}
+        <h1>Welcome to SkyCast</h1>
+    {% endif %}
+    <!-- Additional content here -->
+</div>
+
+<!-- Load JS -->
+<script src="{% static 'js/location.js' %}"></script>
+{% endblock %}

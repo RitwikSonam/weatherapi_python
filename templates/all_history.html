@@ -1,0 +1,78 @@
+{% extends 'dummy.html' %}
+
+{% block title %}
+    <title>All Users' History</title>
+{% endblock %}
+
+{% block body_block %}
+<div class="container-custom">
+    <h1>History of All Users</h1>
+    <p class="lead">Below is the detailed history of all users' weather searches.</p>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>City</th>
+                    <th>Temperature</th>
+                    <th>Humidity</th>
+                    <th>Weather</th>
+                    <th>Speed</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obj in LWO %}
+                <tr>
+                    <td>{{ obj.username }}</td>
+                    <td>{{ obj.city }}</td>
+                    <td>{{ obj.temperature }}</td>
+                    <td>{{ obj.humidity }}</td>
+                    <td>{{ obj.weather }}</td>
+                    <td>{{ obj.speed }}</td>
+                    <td>{{ obj.timestamp }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .table-custom {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-collapse: collapse;
+        border-radius: 15px;
+        overflow: hidden;
+        margin: 20px 0;
+    }
+
+    .table-custom th,
+    .table-custom td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-custom th {
+        background: rgba(255, 255, 255, 0.2);
+        color: #00ffcc;
+        font-weight: bold;
+    }
+
+    .table-custom td {
+        color: #fff;
+    }
+
+    .table-custom tbody tr:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .table-custom tbody tr:nth-child(even) {
+        background: rgba(255, 255, 255, 0.05);
+    }
+</style>
+{% endblock %}

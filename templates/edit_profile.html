@@ -1,0 +1,13 @@
+{% extends 'dummy.html' %}
+{% block title %}<title>Edit Profile</title>{% endblock %}
+{% block body_block %}
+<div class="container-custom">
+    <h1>Edit Your Profile</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ uf.as_p }}
+        {{ pf.as_p }}
+        <button type="submit" class="btn btn-custom">Update</button>
+    </form>
+</div>
+{% endblock %}
