@@ -1,263 +1,150 @@
-
-from app.forms import *
-from django.http import HttpResponse,HttpResponseRedirect
-from django.core.mail import send_mail
-from django.contrib.auth import authenticate,login,logout
-from django.urls import reverse
-from django.contrib.auth.decorators import login_required
-import requests
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .forms import UserUpdateForm, ProfileUpdateForm
+import requests
+from django.conf import settings
+from app.forms import *
+from django.http import HttpResponse, HttpResponseRedirect
+from django.core.mail import send_mail
+from django.contrib.auth import authenticate, login, logout
+from django.urls import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from .models import Profile, WeatherData
+
 
 def home(request):
-    if request.session.get('username'):
-        username=request.session.get('username')
-        d={'username':username}
-        return render(request,'home.html',d)
-    return render(request,'home.html')
+    return render(request, 'home.html')
 
 def registration(request):
-    uf=UserForm()
-    pf=ProfileForm()
-    d={'uf':uf,'pf':pf}
-
-    if request.method=='POST' and request.FILES:
-        UFD=UserForm(request.POST)
-        PFD=ProfileForm(request.POST,request.FILES)
+    uf = UserForm()
+    pf = ProfileForm()
+    
+    if request.method == 'POST' and request.FILES:
+        UFD = UserForm(request.POST)
+        PFD = ProfileForm(request.POST, request.FILES)
+        
         if UFD.is_valid() and PFD.is_valid():
-            UFO=UFD.save(commit=False)
-            password=UFD.cleaned_data['password']
-            UFO.set_password(password)
-            UFO.save()
+            user = UFD.save(commit=False)
+            password = UFD.cleaned_data['password']
+            user.set_password(password)
+            user.save()
 
-            PFO=PFD.save(commit=False)
-            PFO.profile_user=UFO
-            PFO.save()
+            profile = PFD.save(commit=False)
+            profile.profile_user = user
+            profile.save()
 
-            send_mail('registration',
-            'Thanks for registartion,ur registration is Successfull',
-            'ritwiksonam1@gmail.com',
-            [UFO.email],
-            fail_silently=False
-            
+            send_mail(
+                'Registration Successful',
+                'Thanks for registering. Your registration is successful.',
+                settings.EMAIL_HOST_USER, # Use the email from settings
+                [user.email],
+                fail_silently=False
             )
-            return HttpResponse('registration is succeffull')
+            messages.success(request, 'Registration successful! You can now log in.')
+            return redirect('user_login')
+        else:
+            messages.error(request, 'Registration failed. Please correct the errors.')
 
-
-    return render(request,'registration.html',d)
+    return render(request, 'registration.html', {'uf': uf, 'pf': pf})
 
 def user_login(request):
-    if request.method=='POST':
-        username=request.POST['un']
-        password=request.POST['pw']
-        user=authenticate(username=username,password=password)
+    if request.method == 'POST':
+        username = request.POST['un']
+        password = request.POST['pw']
+        user = authenticate(username=username, password=password)
 
         if user and user.is_active:
-            login(request,user)
-            request.session['username']=username
-            return HttpResponseRedirect(reverse('home'))
+            login(request, user)
+            messages.success(request, f'Welcome back, {username}!')
+            return redirect('home')
         else:
-            return HttpResponse('u r not an authenticated user')
-    return render(request,'user_login.html')
-
-
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'user_login.html')
 
 @login_required
 def user_logout(request):
     logout(request)
-    return HttpResponseRedirect(reverse('home'))
+    messages.info(request, 'You have been logged out.')
+    return redirect('home')
 
 @login_required
 def profile_display(request):
-    un=request.session.get('username')
-    UO=User.objects.get(username=un)
-    PO=Profile.objects.get(profile_user=UO)
-    d={'UO':UO,'PO':PO}
-    return render(request,'profile_display.html',d)
+    try:
+        profile = Profile.objects.get(profile_user=request.user)
+        return render(request, 'profile_display.html', {'user': request.user, 'profile': profile})
+    except Profile.DoesNotExist:
+        messages.error(request, 'Profile not found.')
+        return redirect('home')
 
 @login_required
 def change_password(request):
-
-    if request.method=='POST':
-        pw=request.POST['password']
-
-        un=request.session.get('username')
-        UO=User.objects.get(username=un)
-
-        UO.set_password(pw)
-        UO.save()
-        return HttpResponse('password is changed successfully')
-
-    return render(request,'change_password.html')
-
+    if request.method == 'POST':
+        new_password = request.POST.get('password')
+        if new_password:
+            user = request.user
+            user.set_password(new_password)
+            user.save()
+            messages.success(request, 'Your password has been changed successfully.')
+            return redirect('profile_display')
+        else:
+            messages.error(request, 'Please provide a new password.')
+    return render(request, 'change_password.html')
 
 def reset_password(request):
-
-    if request.method=='POST':
-        un=request.POST['un']
-        pw=request.POST['pw']
-
-        LUO=User.objects.filter(username=un)
-
-        if LUO:
-            UO=LUO[0]
-            UO.set_password(pw)
-            UO.save()
-            return HttpResponse('password reset is done')
-        else:
-            return HttpResponse('user is not present in my DB')
-        
-
-        return HttpResponse('Reset password is done successfully')
-    return render(request,'reset_password.html')
-
-
-
-
-
-@login_required
-def search(request):
-    if request.method=='POST':
-        city_name=request.POST['city']
-        api_key = '30d4741c779ba94c470ca1f63045390a'
-        url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&appid={api_key}'
-        response = requests.get(url)
-        weather_data = response.json()
-        print(weather_data)
-        temperature = weather_data['main']['temp'] - 273.15
-        humidity = weather_data['main']['humidity']
-        weather=weather_data['main']['feels_like'] - 273.15
-        speed=weather_data['wind']['speed']
-        username=request.session.get('username')
-        LUO=User.objects.get(username=username)
-        obj=WeatherData.objects.get_or_create(username=LUO,city=city_name, temperature=round (temperature, 2), humidity=humidity,weather=round(weather, 2), speed=speed)[0]
-        obj.save()
-        d={'obj':obj}
-        return render(request,'search.html',d)
-    
-    return render(request,'search.html')
-
-
-
-@login_required
-def user_history(request):
-    username=request.session['username']
-    UO=User.objects.get(username=username)
-    LWO=WeatherData.objects.filter(username=UO)
-
-    d={'LWO':LWO}
-    return render(request,'user_history.html',d)
-
-
-def all_history(request):
-    LWO=WeatherData.objects.all()
-    d={'LWO':LWO}
-    return render(request,'user_history.html',d)
-
-@login_required
-def edit_profile(request):
     if request.method == 'POST':
-        uf = UserUpdateForm(request.POST, instance=request.user)
-        pf = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
+        un = request.POST.get('un')
+        pw = request.POST.get('pw')
 
-        if uf.is_valid() and pf.is_valid():
-            uf.save()
-            pf.save()
-            messages.success(request, 'Profile updated successfully!')
-            return redirect('profile_display')
-    else:
-        uf = UserUpdateForm(instance=request.user)
-        pf = ProfileUpdateForm(instance=request.user.profile)
+        try:
+            user = User.objects.get(username=un)
+            user.set_password(pw)
+            user.save()
+            messages.success(request, 'Password reset is done successfully.')
+            return redirect('user_login')
+        except User.DoesNotExist:
+            messages.error(request, f'User "{un}" is not present in my database.')
 
-    return render(request, 'edit_profile.html', {'uf': uf, 'pf': pf})
+    return render(request, 'reset_password.html')
 
+def fetch_weather_data(request):
+    context = {}
 
-
-@login_required
-def delete_profile(request):
     if request.method == 'POST':
-        user = request.user
-        logout(request)
-        user.delete()
-        messages.success(request, 'Your profile has been deleted.')
-        return redirect('home')
-    return render(request, 'delete_confirm.html')
+        city_name = request.POST.get('city')
+        api_key ='0ddac2f2a96230b519b9119dd73f6bce'
+        url = f'http://api.openweathermap.org/data/2.5/weather?q={city_name}&units=metric&appid={api_key}'
 
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            weather_data = response.json()
 
-from django.http import JsonResponse
-import requests
+            if weather_data.get('cod') != 200:
+                context['error_message'] = f"City '{city_name}' not found. Please try again."
+            else:
+                weather_info = {
+                    'city': weather_data.get('name'),
+                    'temperature': weather_data['main']['temp'],
+                    'humidity': weather_data['main']['humidity'],
+                    'description': weather_data['weather'][0]['description'],
+                    'wind_speed': weather_data['wind']['speed'],
+                    'pressure': weather_data['main']['pressure'],
+                    'feels_like': weather_data['main']['feels_like'],
+                }
+                context['weather_data'] = weather_info
 
-def get_weather(request):
-    lat = request.GET.get('lat')
-    lon = request.GET.get('lon')
-    if not lat or not lon:
-        return JsonResponse({'error': 'Missing coordinates'}, status=400)
+                if request.user.is_authenticated:
+                    WeatherData.objects.create(
+                        username=request.user,
+                        city=weather_info['city'],
+                        temperature=weather_info['temperature'],
+                        humidity=weather_info['humidity'],
+                        weather=weather_info['description'],
+                        speed=weather_info['wind_speed']
+                    )
+        except requests.exceptions.RequestException as e:
+            context['error_message'] = f"An error occurred: {e}"
+        except (KeyError, IndexError):
+            context['error_message'] = f"Could not retrieve data for '{city_name}'. Please check the city name and try again."
 
-    try:
-        # Replace with your actual weather API call
-        url = f'https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid=YOUR_API_KEY&units=metric'
-        response = requests.get(url)
-        data = response.json()
-        return JsonResponse({
-            'weather': data['weather'][0]['main'],
-            'temperature': data['main']['temp']
-        })
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return render(request, 'fetch_weather_data.html', context)
