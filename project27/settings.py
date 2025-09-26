@@ -7,7 +7,7 @@ For more information on this file, see
 https://docs.djangoproject.com/en/4.0/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/4.0/ref/settings/
+https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 """
 
 from pathlib import Path
@@ -15,10 +15,10 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 import os
-TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
-MEDIA_DIR=os.path.join(BASE_DIR,'media')#path of the media folder
+TEMPLATE_DIR = os.path.join(BASE_DIR, 'templates')
+MEDIA_DIR = os.path.join(BASE_DIR, 'media') #path of the media folder
 
-MEDIA_ROOT=MEDIA_DIR
+MEDIA_ROOT = MEDIA_DIR
 
 
 # Quick-start development settings - unsuitable for production
@@ -111,7 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'Asia/Kolkata'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
@@ -121,9 +121,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
+STATIC_URL = 'static/'
 
-
-MEDIA_URL='media/'
+MEDIA_URL = 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -131,31 +131,9 @@ MEDIA_URL='media/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_HOST='smtp.gmail.com'
-EMAIL_HOST_USER='ritwiksonam1@gmail.com'
-EMAIL_HOST_PASSWORD='ptsp nggm iwif xkad'
-EMAIL_USE_TLS=True
-EMAIL_USE_SSL=False
-EMAIL_PORT=587
-
-
-import os
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",  # or os.path.join(BASE_DIR, 'static')
-]
-
-# URL to access static files
-STATIC_URL = '/static/'
-
-# Where to collect static files
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-
-
-
-
-
-
-
-
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'ritwiksonam1'
+EMAIL_HOST_PASSWORD = 'xxxxxxxxxxxxxx'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
