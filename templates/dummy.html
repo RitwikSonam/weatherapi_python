@@ -1,459 +1,82 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Particles.js for weather effects -->
-    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 
-    <!-- Custom CSS -->
-    <style>
-      :root {
-        --primary-color: #3b82f6;
-        --primary-dark: #1e3a8a;
-        --primary-light: #dbeafe;
-        --text-color: #1e3a8a;
-        --text-light: #f8fafc;
-      }
-      
-      body {
-        color: var(--text-color);
-        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-      }
-
-      /* Weather Background Layer */
-      .weather-bg {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        transition: all 1s ease;
-      }
-      
-      /* Weather Types */
-      .weather-sunny {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
-      }
-      .weather-cloudy {
-        background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
-      }
-      .weather-rainy {
-        background: linear-gradient(135deg, #4b79cf 0%, #283e51 100%);
-      }
-      .weather-stormy {
-        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-      }
-      .weather-snowy {
-        background: linear-gradient(135deg, #e6e9f0 0%, #eef1f5 100%);
-      }
-      .weather-default {
-        background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%);
-      }
-
-      /* Particles Container */
-      #particles-js {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-      }
-
-      /* Content Container */
-      .content-wrapper {
-        background-color: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(5px);
-        border-radius: 15px;
-        padding: 2rem;
-        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
-        margin: 30px 0;
-      }
-
-      .navbar-custom {
-        background: rgba(30, 58, 138, 0.9) !important;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      }
-
-      .navbar-brand {
-        font-weight: 700;
-        font-size: 1.5rem;
-        display: flex;
-        align-items: center;
-      }
-      
-      .navbar-brand i {
-        margin-right: 10px;
-        font-size: 1.3rem;
-      }
-
-      .navbar-custom .nav-link {
-        color: var(--text-light) !important;
-        font-weight: 500;
-        margin: 0 10px;
-        transition: all 0.3s ease;
-        position: relative;
-        padding: 8px 12px;
-      }
-
-      .navbar-custom .nav-link:hover {
-        color: #93c5fd !important;
-        transform: translateY(-2px);
-      }
-
-      .navbar-custom .nav-link.active {
-        color: #93c5fd !important;
-      }
-      
-      .navbar-custom .nav-link.active:after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 12px;
-        right: 12px;
-        height: 2px;
-        background: #93c5fd;
-        border-radius: 2px;
-      }
-
-      .container-custom {
-        margin-top: 30px;
-        margin-bottom: 50px;
-        flex: 1;
-      }
-      
-      footer {
-        background: var(--primary-dark);
-        color: var(--text-light);
-        padding: 20px 0;
-        margin-top: auto;
-      }
-      
-      .footer-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      
-      .social-links a {
-        color: var(--text-light);
-        margin-left: 15px;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-      }
-      
-      .social-links a:hover {
-        color: #93c5fd;
-        transform: translateY(-2px);
-      }
-
-      .btn-custom {
-        background: var(--primary-color);
-        color: var(--text-light);
-        border: none;
-        padding: 10px 24px;
-        border-radius: 30px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
-      }
-
-      .btn-custom:hover {
-        background: var(--primary-dark);
-        color: var(--text-light);
-        transform: translateY(-2px) scale(1.03);
-        box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
-      }
-      
-      /* Location Prompt */
-      .location-prompt {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-      }
-      
-      .location-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 15px;
-        max-width: 500px;
-        text-align: center;
-      }
-      
-      /* Responsive adjustments */
-      @media (max-width: 992px) {
-        .navbar-custom .nav-link {
-          margin: 0 5px;
-        }
-      }
-      
-      @media (max-width: 768px) {
-        .container-custom {
-          margin-top: 20px;
-        }
-        
-        .navbar-custom .nav-link {
-          padding: 8px 0;
-          margin: 0;
-        }
-        
-        .navbar-custom .nav-link.active:after {
-          display: none;
-        }
-        
-        .content-wrapper {
-          padding: 1rem;
-        }
-      }
-    </style>
-
-    {% block title %}
-    <title>SkyCast Weather</title>
-    {% endblock %}
-    
-    {% block extra_css %}{% endblock %}
-  </head>
-  <body>
-    <!-- Weather Background -->
-    <div class="weather-bg weather-default"></div>
-    <div id="particles-js"></div>
-    
-    <!-- Location Prompt (hidden by default) -->
-    <div class="location-prompt" id="locationPrompt" style="display: none;">
-      <div class="location-card">
-        <h3><i class="fas fa-map-marker-alt"></i> Personalize Your Weather</h3>
-        <p>Allow location access to see weather conditions for your area</p>
-        <button class="btn btn-custom mt-3" id="allowLocation">
-          <i class="fas fa-check-circle"></i> Allow Location
-        </button>
-        <button class="btn btn-secondary mt-3" id="denyLocation">
-          <i class="fas fa-times-circle"></i> Maybe Later
-        </button>
-      </div>
-    </div>
-
-    <nav class="navbar navbar-expand-lg navbar-custom">
-      <a class="navbar-brand text-light font-weight-bold" href="#">
-        <i class="fas fa-cloud-sun"></i>SkyCast
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item"><a href="{% url 'admin:index' %}" class="nav-link {% if request.path == '/admin/' %}active{% endif %}"><i class="fas fa-user-shield"></i> Admin</a></li>
-          <li class="nav-item"><a href="{% url 'home' %}" class="nav-link {% if request.path == '/' %}active{% endif %}"><i class="fas fa-home"></i> Home</a></li>
-
-          {% if not user.is_authenticated %}
-            <li class="nav-item"><a href="{% url 'registration' %}" class="nav-link {% if request.path == '/registration/' %}active{% endif %}"><i class="fas fa-user-plus"></i> Register</a></li>
-            <li class="nav-item"><a href="{% url 'user_login' %}" class="nav-link {% if request.path == '/user_login/' %}active{% endif %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
-          {% endif %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" 
+          rel="stylesheet" 
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" 
+          crossorigin="anonymous">
           
-          {% if user.is_authenticated %}
-            <li class="nav-item"><a href="{% url 'user_logout' %}" class="nav-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-            <li class="nav-item"><a href="{% url 'profile_display' %}" class="nav-link {% if request.path == '/profile_display/' %}active{% endif %}"><i class="fas fa-user"></i> Profile</a></li>
-            <li class="nav-item"><a href="{% url 'change_password' %}" class="nav-link {% if request.path == '/change_password/' %}active{% endif %}"><i class="fas fa-key"></i> Change Password</a></li>
-            <li class="nav-item"><a href="{% url 'search' %}" class="nav-link {% if request.path == '/search/' %}active{% endif %}"><i class="fas fa-search"></i> Search</a></li>
-            <li class="nav-item"><a href="{% url 'user_history' %}" class="nav-link {% if request.path == '/user_history/' %}active{% endif %}"><i class="fas fa-history"></i> History</a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-    <div class="container container-custom">
-      <div class="content-wrapper">
+{% block title %}
+    <title>Modern Weather App</title>
+{% endblock %}
+</head>
+<body class="bg-light">
+    
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #6a1b9a;">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'home' %}">
+                <i class="fa-solid fa-cloud-sun me-2"></i> WeatherPro
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+                    data-bs-target="#navbarNav" aria-controls="navbarNav" 
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'registration' %}">Register</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile_display' %}">
+                            <i class="fa-solid fa-user me-1"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'change_password' %}">Change Password</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-sm btn-outline-light ms-2" href="{% url 'user_logout' %}">
+                            Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'user_login' %}">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Login
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
         {% block body_block %}
         {% endblock %}
-      </div>
     </div>
 
-    <footer>
-      <div class="container footer-content">
-        <div class="copyright">
-          &copy; {% now "Y" %} SkyCast Weather. All rights reserved.
-        </div>
-        <div class="social-links">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-          <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-        </div>
-      </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Weather Effects Script -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        // Check if user is logged in
-        const isLoggedIn = {% if user.is_authenticated %}true{% else %}false{% endif %};
-        
-        if(isLoggedIn) {
-          // Show location prompt if not already asked
-          if(!localStorage.getItem('locationAsked')) {
-            showLocationPrompt();
-          }
-        }
-        
-        // Initialize particles with default config
-        initParticles('default');
-      });
-      
-      function showLocationPrompt() {
-        const prompt = document.getElementById('locationPrompt');
-        prompt.style.display = 'flex';
-        
-        document.getElementById('allowLocation').addEventListener('click', function() {
-          getLocation();
-          prompt.style.display = 'none';
-          localStorage.setItem('locationAsked', 'true');
-        });
-        
-        document.getElementById('denyLocation').addEventListener('click', function() {
-          prompt.style.display = 'none';
-          localStorage.setItem('locationAsked', 'true');
-        });
-      }
-      
-      function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(
-            function(position) {
-              // Call your Django view to get weather data
-              fetch(`/get_weather/?lat=${position.coords.latitude}&lon=${position.coords.longitude}`)
-                .then(response => response.json())
-                .then(data => {
-                  setWeatherTheme(data.weather);
-                });
-            },
-            function(error) {
-              console.log("Error getting location:", error);
-            }
-          );
-        }
-      }
-      
-      function setWeatherTheme(weatherCondition) {
-        const weatherBg = document.querySelector('.weather-bg');
-        
-        // Reset classes
-        weatherBg.className = 'weather-bg';
-        
-        // Set appropriate weather class
-        if(weatherCondition.includes('rain')) {
-          weatherBg.classList.add('weather-rainy');
-          initParticles('rain');
-        } else if(weatherCondition.includes('cloud')) {
-          weatherBg.classList.add('weather-cloudy');
-          initParticles('cloud');
-        } else if(weatherCondition.includes('sun') || weatherCondition.includes('clear')) {
-          weatherBg.classList.add('weather-sunny');
-          initParticles('sun');
-        } else if(weatherCondition.includes('snow')) {
-          weatherBg.classList.add('weather-snowy');
-          initParticles('snow');
-        } else if(weatherCondition.includes('storm') || weatherCondition.includes('thunder')) {
-          weatherBg.classList.add('weather-stormy');
-          initParticles('storm');
-        } else {
-          weatherBg.classList.add('weather-default');
-          initParticles('default');
-        }
-      }
-      
-      function initParticles(type) {
-        let config;
-        
-        switch(type) {
-          case 'sun':
-            config = {
-              particles: {
-                number: { value: 30, density: { enable: true, value_area: 800 } },
-                color: { value: "#ffcc00" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 5, random: true },
-                line_linked: { enable: false },
-                move: { 
-                  enable: true, 
-                  speed: 1, 
-                  direction: "none", 
-                  random: true, 
-                  straight: false, 
-                  out_mode: "out" 
-                }
-              }
-            };
-            break;
-            
-          case 'rain':
-            config = {
-              particles: {
-                number: { value: 200, density: { enable: true, value_area: 800 } },
-                color: { value: "#a1c6ff" },
-                shape: { type: "circle" },
-                opacity: { value: 0.7, random: true },
-                size: { value: 2, random: true },
-                line_linked: { enable: false },
-                move: { 
-                  enable: true, 
-                  speed: 5, 
-                  direction: "bottom", 
-                  random: false, 
-                  straight: true, 
-                  out_mode: "out" 
-                }
-              }
-            };
-            break;
-            
-          // Add more weather types as needed
-            
-          default:
-            config = {
-              particles: {
-                number: { value: 50, density: { enable: true, value_area: 800 } },
-                color: { value: "#3b82f6" },
-                shape: { type: "circle" },
-                opacity: { value: 0.5, random: true },
-                size: { value: 3, random: true },
-                line_linked: { enable: false },
-                move: { 
-                  enable: true, 
-                  speed: 2, 
-                  direction: "none", 
-                  random: true, 
-                  straight: false, 
-                  out_mode: "out" 
-                }
-              }
-            };
-        }
-        
-        particlesJS('particles-js', config);
-      }
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+            crossorigin="anonymous">
     </script>
-    
-    {% block extra_js %}{% endblock %}
-  </body>
+</body>
 </html>
